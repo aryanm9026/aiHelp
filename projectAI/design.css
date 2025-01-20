@@ -7,7 +7,7 @@
 }
 
 .extention-body{
-    background-color: rgb(220, 192, 255);
+    background-color: rgb(0, 0, 0);
     border-radius: 5%;
     font-family: "Open Sans", sans-serif;
     font-weight: bold;
@@ -19,13 +19,10 @@
     font-family: "Open Sans", sans-serif;
   font-optical-sizing: auto;
   font-weight: bold;
-  /* font-style: normal;
-  font-variation-settings:
-    "wdth" 100; */
 }
 
 .main-box{
-    background-color: rgb(220, 192, 255);
+    background-color: rgb(0, 0, 0); 
     border-radius: 5%;
     margin: 3%;
 }
