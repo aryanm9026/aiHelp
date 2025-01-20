@@ -1,0 +1,31 @@
+* {
+    padding: 5px;
+    margin: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-radius: 5%;
+}
+
+.extention-body{
+    background-color: rgb(220, 192, 255);
+    border-radius: 5%;
+    font-family: "Open Sans", sans-serif;
+    font-weight: bold;
+    border-color: black;
+    border-style: dashed;
+}
+
+.extention-body1{
+    font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  /* font-style: normal;
+  font-variation-settings:
+    "wdth" 100; */
+}
+
+.main-box{
+    background-color: rgb(220, 192, 255);
+    border-radius: 5%;
+    margin: 3%;
+}

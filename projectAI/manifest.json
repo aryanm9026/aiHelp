@@ -1,0 +1,11 @@
+{
+    "name": "A! Help",
+    "version": "1.0.0",
+    "description": "AI for help in coding on platforms",
+    "manifest_version": 3,
+    "author": "Aryan Mishra",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "A! Help"
+    }
+}
