@@ -3,13 +3,14 @@
   "name": "Coding Problem AI Helper",
   "version": "1.0",
   "description": "Provides AI assistance for coding problems.",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
   "background": {
       "service_worker": "background.js"
   },
   "host_permissions": [
-      "*://*.leetcode.com/*",
-      "*://*.hackerrank.com/*"
+      "https://*.leetcode.com/*",
+      "https://*.hackerrank.com/*",
+      "https://api.openai.com/v1/*"
   ],
   "content_scripts": [
       {
@@ -19,11 +20,5 @@
   ],
   "action": {
       "default_popup": "popup.html"
-  
-                  
-          
-      
   }
 }
-
-  

@@ -31,3 +31,5 @@ fetch("https://api.openai.com/v1/chat/completions", {
     readChunk(); // Start reading
 })
 .catch(err => console.error("Fetch error:", err));
+
+console.log('AI_API.js');

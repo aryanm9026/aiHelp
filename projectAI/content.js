@@ -1,4 +1,3 @@
-// Create and display the chat box on the webpage
 function createChatBox() {
     let chatBox = document.getElementById("ai-chat-box");
     if (!chatBox) {
@@ -6,98 +5,83 @@ function createChatBox() {
         chatBox.id = "ai-chat-box";
         chatBox.style.cssText = `
             position: fixed;
-            bottom: 10px;
-            right: 10px;
+            bottom: 20px;
+            right: 20px;
             width: 300px;
             height: 400px;
             background: white;
             border: 1px solid #ccc;
-            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2);
-            overflow: auto;
-            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
             z-index: 10000;
         `;
 
-        // Add an input box
-        const inputBox = document.createElement("textarea");
-        inputBox.id = "chat-input";
-        inputBox.placeholder = "Type your query here...";
-        inputBox.style.cssText = `
-            width: 100%;
-            height: 50px;
-            margin-top: 10px;
+        chatBox.innerHTML = `
+            <div style="padding: 10px; background: #4CAF50; color: white; border-radius: 8px 8px 0 0;">
+                AI Coding Assistant
+            </div>
+            <div id="response-container" style="flex: 1; overflow-y: auto; padding: 10px;">
+            </div>
+            <div style="padding: 10px; border-top: 1px solid #eee;">
+                <textarea id="chat-input" placeholder="Type your query here..." 
+                    style="width: 100%; height: 60px; margin-bottom: 5px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; resize: none;"></textarea>
+                <button id="send-button" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Send
+                </button>
+            </div>
         `;
 
-        // Add a send button
-        const sendButton = document.createElement("button");
-        sendButton.textContent = "Send";
-        sendButton.style.cssText = `
-            width: 100%;
-            margin-top: 5px;
-            background-color:rgb(76, 175, 79);
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-        `;
-
-        // Add a container for AI responses
-        const responseContainer = document.createElement("div");
-        responseContainer.id = "response-container";
-        responseContainer.style.cssText = `
-            height: calc(100% - 100px);
-            overflow-y: auto;
-        `;
-
-        // Append everything to the chat box
-        chatBox.appendChild(responseContainer);
-        chatBox.appendChild(inputBox);
-        chatBox.appendChild(sendButton);
-
-        // Add the chat box to the body
         document.body.appendChild(chatBox);
 
-        // Add event listener for the send button
-        sendButton.addEventListener("click", () => {
-            const userInput = inputBox.value;
-            if (userInput.trim()) {
-                addUserMessage(userInput); // Display user message
-                sendToAI(userInput);       // Send user input to the AI
-                inputBox.value = "";       // Clear input box
+        const sendButton = chatBox.querySelector('#send-button');
+        const inputBox = chatBox.querySelector('#chat-input');
+
+        sendButton.addEventListener('click', handleSendMessage);
+        inputBox.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
             }
         });
     }
 }
 
-// Display user message in the chat
-function addUserMessage(message) {
-    const responseContainer = document.getElementById("response-container");
-    const userMessage = document.createElement("div");
-    userMessage.textContent = `You: ${message}`;
-    userMessage.style.cssText = "margin-bottom: 10px; font-weight: bold;";
-    responseContainer.appendChild(userMessage);
-    responseContainer.scrollTop = responseContainer.scrollHeight; // Auto-scroll
-}
-
-// Send the user's input to the AI via the background script
-function sendToAI(userInput) {
-    chrome.runtime.sendMessage({
-        action: "userInput",
-        data: userInput,
-    });
-}
-
-// Receive and display AI response
-chrome.runtime.onMessage.addListener((message) => {
-    if (message.action === "aiResponse") {
-        const aiResponse = message.data;
-        const responseContainer = document.getElementById("response-container");
-        const aiMessage = document.createElement("div");
-        aiMessage.textContent = `AI: ${aiResponse}`;
-        aiMessage.style.cssText = "margin-bottom: 10px;";
-        responseContainer.appendChild(aiMessage);
-        responseContainer.scrollTop = responseContainer.scrollHeight; // Auto-scroll
+function handleSendMessage() {
+    const inputBox = document.querySelector('#chat-input');
+    const userInput = inputBox.value.trim();
+    
+    if (userInput) {
+        addMessage('You', userInput, 'user-message');
+        inputBox.value = '';
+        
+        chrome.runtime.sendMessage({
+            action: 'userInput',
+            data: userInput
+        });
     }
+}
+
+function addMessage(sender, text, className) {
+    const container = document.querySelector('#response-container');
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 4px;
+        background-color: ${className === 'user-message' ? '#e3f2fd' : '#f5f5f5'};
+    `;
+    messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'aiResponse') {
+        addMessage('AI', message.data, 'ai-message');
+    }
+    return true;
 });
 
 // Initialize the chat box

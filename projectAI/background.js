@@ -1,28 +1,63 @@
+// background.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "sendProblemData") {
-        const { title, description } = message.data;
+    if (message.action === "userInput") {
+        handleAIRequest(message.data)
+            .then(aiResponse => {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                    action: "aiResponse",
+                    data: aiResponse
+                });
+            })
+            .catch(error => {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                    action: "aiResponse",
+                    data: `Error: ${error.message}`
+                });
+            });
+        return true;
+    }
+});
 
-        // Call the AI API (OpenAI, for instance)
-        fetch("https://api.openai.com/v1/completions", {
+async function getAPIKey() {
+    const result = await chrome.storage.local.get(['openai_api_key']);
+    if (!result.openai_api_key) {
+        throw new Error("Please set your OpenAI API key in the extension popup");
+    }
+    return result.openai_api_key;
+}
+
+async function handleAIRequest(userInput) {
+    try {
+        const apiKey = await getAPIKey();
+        if (!apiKey) throw new Error("API key not configured");
+
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer YOUR_API_KEY`,
+                "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "text-davinci-003",
-                prompt: `Provide guidance for the following coding problem:\n\nTitle: ${title}\nDescription: ${description}`,
-                max_tokens: 500,
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Send the AI response back to the content script
-            chrome.tabs.sendMessage(sender.tab.id, {
-                action: "receiveAIResponse",
-                data: data.choices[0].text,
-            });
-        })
-        .catch(err => console.error("Error:", err));
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: userInput }]
+            })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            console.error("API Error Response:", data);
+            throw new Error(data.error?.message || `API request failed with status ${response.status}`);
+        }
+
+        if (!data.choices?.[0]?.message?.content) {
+            throw new Error("Invalid API response structure");
+        }
+
+        return data.choices[0].message.content;
+        
+    } catch (error) {
+        console.error("API Error:", error);
+        throw new Error(`AI processing failed: ${error.message}`);
     }
-});
+}
