@@ -1,24 +1,37 @@
+
 {
-  "manifest_version": 3,
-  "name": "Coding Problem AI Helper",
-  "version": "1.0",
-  "description": "Provides AI assistance for coding problems.",
-  "permissions": ["activeTab", "scripting", "storage"],
-  "background": {
-      "service_worker": "background.js"
-  },
-  "host_permissions": [
-      "https://*.leetcode.com/*",
-      "https://*.hackerrank.com/*",
-      "https://api.openai.com/v1/*"
-  ],
-  "content_scripts": [
-      {
-          "matches": ["*://*.leetcode.com/*", "*://*.hackerrank.com/*"],
-          "js": ["content.js"]
-      }
-  ],
-  "action": {
+    "manifest_version": 3,
+    "name": "AI",
+    "version": "2.0",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+    ],
+    "host_permissions": [
+        "https://leetcode.com/*",
+        "https://codeforces.com/*",
+        "*://*/*notebook*",
+        "https://colab.google.com/*",
+        "https://*.jupyter.org/*",
+        "http://localhost:*/*",
+        "https://generativelanguage.googleapis.com/*"
+    ],
+    "action": {
       "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": [
+          "https://leetcode.com/*",
+          "https://codeforces.com/*",
+          "*://*/*notebook*"
+        ],
+        "js": ["content.js"]
+      }
+    ]
   }
-}
+  
