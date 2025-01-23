@@ -1,4 +1,3 @@
-// content.js
 // content.js - Add this comprehensive extraction function
 async function extractCodeAndContent() {
     try {
@@ -116,10 +115,11 @@ function createChatBox() {
             display: flex;
             flex-direction: column;
             z-index: 10000;
+            overflow: hidden; /* Prevent content from overflowing during resize */
         `;
 
         chatBox.innerHTML = `
-            <div style="padding: 10px; background:rgb(0, 0, 0); color: white; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between;">
+            <div id="chat-header" style="padding: 10px; background:rgb(0, 0, 0); color: white; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; cursor: move;">
                 <span>AI Coding Assistant</span>
                 <button id="minimize-chat" style="background: none; border: none; color: white; cursor: pointer;">−</button>
             </div>
@@ -132,6 +132,11 @@ function createChatBox() {
                     Send
                 </button>
             </div>
+            <!-- Resize handles for all four corners -->
+            <div id="resize-handle-top-left" style="position: absolute; top: 0; left: 0; width: 10px; height: 10px; background: #ccc; cursor: nw-resize;"></div>
+            <div id="resize-handle-top-right" style="position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: #ccc; cursor: ne-resize;"></div>
+            <div id="resize-handle-bottom-left" style="position: absolute; bottom: 0; left: 0; width: 10px; height: 10px; background: #ccc; cursor: sw-resize;"></div>
+            <div id="resize-handle-bottom-right" style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #ccc; cursor: se-resize;"></div>
         `;
 
         document.body.appendChild(chatBox);
@@ -140,19 +145,129 @@ function createChatBox() {
         const inputBox = chatBox.querySelector('#chat-input');
         const minimizeButton = chatBox.querySelector('#minimize-chat');
         const responseContainer = chatBox.querySelector('#response-container');
+        const chatHeader = chatBox.querySelector('#chat-header');
 
-        let isMinimized = false;
+        // Load the minimized state from localStorage
+        let isMinimized = localStorage.getItem('chatMinimized') === 'true';
+
+        // Set the initial state of the chat box
+        if (isMinimized) {
+            minimizeChatBox(chatBox, minimizeButton, responseContainer);
+        }
+
+        // Toggle the minimized state when the minimize button is clicked
         minimizeButton.addEventListener('click', () => {
-            if (isMinimized) {
-                responseContainer.style.display = 'block';
-                chatBox.style.height = '400px';
-                minimizeButton.textContent = '−';
-            } else {
-                responseContainer.style.display = 'none';
-                chatBox.style.height = 'auto';
-                minimizeButton.textContent = '+';
-            }
             isMinimized = !isMinimized;
+            localStorage.setItem('chatMinimized', isMinimized); // Save the state to localStorage
+
+            if (isMinimized) {
+                minimizeChatBox(chatBox, minimizeButton, responseContainer);
+            } else {
+                expandChatBox(chatBox, minimizeButton, responseContainer);
+            }
+        });
+
+        // Add drag-to-move functionality
+        let isDragging = false;
+        let startDragX, startDragY, startBoxX, startBoxY;
+
+        chatHeader.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startDragX = e.clientX;
+            startDragY = e.clientY;
+            startBoxX = parseInt(chatBox.style.left, 10) || chatBox.offsetLeft;
+            startBoxY = parseInt(chatBox.style.top, 10) || chatBox.offsetTop;
+            e.preventDefault(); // Prevent text selection while dragging
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - startDragX;
+                const deltaY = e.clientY - startDragY;
+                chatBox.style.left = `${startBoxX + deltaX}px`;
+                chatBox.style.top = `${startBoxY + deltaY}px`;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Add resize functionality for all four corners
+        const resizeHandles = {
+            'top-left': chatBox.querySelector('#resize-handle-top-left'),
+            'top-right': chatBox.querySelector('#resize-handle-top-right'),
+            'bottom-left': chatBox.querySelector('#resize-handle-bottom-left'),
+            'bottom-right': chatBox.querySelector('#resize-handle-bottom-right'),
+        };
+
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startTop, startLeft;
+        let resizeCorner = null;
+
+        Object.entries(resizeHandles).forEach(([corner, handle]) => {
+            handle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                resizeCorner = corner;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(chatBox).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(chatBox).height, 10);
+                startTop = parseInt(document.defaultView.getComputedStyle(chatBox).top, 10);
+                startLeft = parseInt(document.defaultView.getComputedStyle(chatBox).left, 10);
+                e.preventDefault(); // Prevent text selection while resizing
+            });
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isResizing) {
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                let newWidth, newHeight, newTop, newLeft;
+
+                switch (resizeCorner) {
+                    case 'top-left':
+                        newWidth = startWidth - deltaX;
+                        newHeight = startHeight - deltaY;
+                        newTop = startTop + deltaY;
+                        newLeft = startLeft + deltaX;
+                        break;
+                    case 'top-right':
+                        newWidth = startWidth + deltaX;
+                        newHeight = startHeight - deltaY;
+                        newTop = startTop + deltaY;
+                        newLeft = startLeft;
+                        break;
+                    case 'bottom-left':
+                        newWidth = startWidth - deltaX;
+                        newHeight = startHeight + deltaY;
+                        newTop = startTop;
+                        newLeft = startLeft + deltaX;
+                        break;
+                    case 'bottom-right':
+                        newWidth = startWidth + deltaX;
+                        newHeight = startHeight + deltaY;
+                        newTop = startTop;
+                        newLeft = startLeft;
+                        break;
+                }
+
+                // Apply new dimensions without constraints
+                chatBox.style.width = `${newWidth}px`;
+                chatBox.style.height = `${newHeight}px`;
+                if (resizeCorner === 'top-left' || resizeCorner === 'bottom-left') {
+                    chatBox.style.left = `${newLeft}px`;
+                }
+                if (resizeCorner === 'top-left' || resizeCorner === 'top-right') {
+                    chatBox.style.top = `${newTop}px`;
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isResizing = false;
+            resizeCorner = null;
         });
 
         sendButton.addEventListener('click', handleSendMessage);
@@ -163,6 +278,22 @@ function createChatBox() {
             }
         });
     }
+}
+
+// Function to minimize the chat box
+function minimizeChatBox(chatBox, minimizeButton, responseContainer) {
+    chatBox.style.height = 'auto';
+    chatBox.style.width = '200px'; // Make the minimized chat box narrower
+    responseContainer.style.display = 'none';
+    minimizeButton.textContent = '+'; // Change the button to a "+" icon
+}
+
+// Function to expand the chat box
+function expandChatBox(chatBox, minimizeButton, responseContainer) {
+    chatBox.style.height = '400px';
+    chatBox.style.width = '300px'; // Restore the original width
+    responseContainer.style.display = 'block';
+    minimizeButton.textContent = '−'; // Change the button to a "−" icon
 }
 
 function handleSendMessage() {
@@ -191,74 +322,127 @@ function addMessage(sender, text, className) {
         color: #000;
     `;
 
-    if (className === 'ai-message' && text.includes('```')) {
-        // Extract and format the code
-        const codeContent = text.replace(/```[\s\S]*?\n|```/g, '').trim(); // Remove backticks and trim
-        const language = text.match(/```(\w+)/)?.[1] || 'plaintext'; // Detect language if specified
+    // Preprocess the text to replace ** with <b> and __ with <i>
+    const processedText = text
+        .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') // Replace **bold** with <b>bold</b>
+        .replace(/__(.+?)__/g, '<i>$1</i>');   // Replace __italic__ with <i>italic</i>
 
-        const pre = document.createElement('pre');
-        const code = document.createElement('code');
-        pre.style.cssText = `
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 16px; /* Increase font size for better readability */
-            white-space: pre-wrap; /* Wrap long lines */
-        `;
-        code.className = `language-${language}`; // Use for potential syntax highlighting
-        code.textContent = formatCode(codeContent); // Properly formatted code
+    // Check if the text contains code blocks
+    if (processedText.includes('```')) {
+        // Split the text into parts: code and non-code
+        const parts = processedText.split('```');
+        parts.forEach((part, index) => {
+            if (index % 2 === 1) {
+                // This is a code block
+                const codeContent = part.trim();
+                const language = processedText.match(/```(\w+)/)?.[1] || 'plaintext'; // Detect language if specified
 
-        pre.appendChild(code);
+                // Create a pre element for the code block
+                const pre = document.createElement('pre');
+                pre.style.cssText = `
+                    background-color: #f4f4f4;
+                    padding: 10px;
+                    border-radius: 4px;
+                    overflow-x: auto;
+                    font-family: monospace;
+                    font-size: 14px;
+                    white-space: pre-wrap;
+                    margin: 10px 0;
+                `;
 
-        // Add a "Copy Code" button
-        const copyButton = document.createElement('button');
-        copyButton.textContent = 'Copy Code';
-        copyButton.style.cssText = `
-            margin-top: 5px;
-            padding: 5px 10px;
-            font-size: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        `;
-        copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(codeContent).then(() => {
-                alert('Code copied to clipboard!');
-            });
+                // Create a code element for syntax highlighting
+                const code = document.createElement('code');
+                code.className = `language-${language}`;
+                code.textContent = codeContent;
+
+                // Append the code to the pre element
+                pre.appendChild(code);
+
+                // Add a "Copy Code" button
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy Code';
+                copyButton.style.cssText = `
+                    margin-top: 5px;
+                    padding: 5px 10px;
+                    font-size: 12px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                `;
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(codeContent).then(() => {
+                        alert('Code copied to clipboard!');
+                    });
+                });
+
+                // Append the code block and button to the message
+                messageDiv.appendChild(pre);
+                messageDiv.appendChild(copyButton);
+            } else {
+                // This is a text block, render it as HTML
+                const textNode = document.createElement('div');
+                textNode.innerHTML = `<strong>${sender}:</strong> ${formatText(part)}`;
+                textNode.style.marginBottom = '10px'; // Add spacing between text blocks
+                messageDiv.appendChild(textNode);
+            }
         });
-
-        // Append the code block and button
-        messageDiv.appendChild(pre);
-        messageDiv.appendChild(copyButton);
     } else {
-        // Regular text message
-        messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        // No code blocks, just render the text as HTML
+        const textNode = document.createElement('div');
+        textNode.innerHTML = `<strong>${sender}:</strong> ${formatText(processedText)}`;
+        messageDiv.appendChild(textNode);
     }
 
+    // Append the message to the container and scroll to the bottom
     container.appendChild(messageDiv);
     container.scrollTop = container.scrollHeight;
 }
 
-// Function to format code with indentation
-function formatCode(code) {
-    try {
-        const lines = code.split('\n');
-        let minIndent = Math.min(
-            ...lines
-                .filter(line => line.trim()) // Ignore empty lines
-                .map(line => line.match(/^\s*/)?.[0].length || 0) // Count leading spaces
-        );
-        return lines
-            .map(line => (line.startsWith(' '.repeat(minIndent)) ? line.slice(minIndent) : line))
-            .join('\n');
-    } catch {
-        return code; // If formatting fails, return the code as is
-    }
+// Helper function to format text with point-wise lists
+function formatText(text) {
+    // Split the text into lines
+    const lines = text.split('\n');
+    let formattedText = '';
+
+    lines.forEach((line) => {
+        // Check if the line starts with a number (e.g., "1.", "2.", etc.)
+        if (/^\d+\./.test(line.trim())) {
+            // Format as a list item
+            formattedText += `<div style="margin-left: 20px; margin-bottom: 5px;">${line}</div>`;
+        } else {
+            // Format as a regular paragraph
+            formattedText += `<div style="margin-bottom: 5px;">${line}</div>`;
+        }
+    });
+
+    return formattedText;
 }
+// Function to format code with indentation
+function formatText(text) {
+    // Split the text into lines
+    const lines = text.split('\n');
+    let formattedText = '';
+
+    lines.forEach((line) => {
+        // Replace backtick-enclosed text with a styled span
+        line = line.replace(/`([^`]+)`/g, '<span style="display: inline-block; padding: 2px 6px; background-color: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 14px;">$1</span>');
+
+        // Check if the line starts with a number (e.g., "1.", "2.", etc.)
+        if (/^\d+\./.test(line.trim())) {
+            // Format as a list item
+            formattedText += `<div style="margin-left: 20px; margin-bottom: 5px;">${line}</div>`;
+        } else {
+            // Format as a regular paragraph
+            formattedText += `<div style="margin-bottom: 5px;">${line}</div>`;
+        }
+    });
+
+    return formattedText;
+}
+
+
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
