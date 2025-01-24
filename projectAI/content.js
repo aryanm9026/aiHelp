@@ -123,17 +123,8 @@ function createChatBox() {
                 <span>AI Coding Assistant</span>
                 <button id="minimize-chat" style="background: none; border: none; color: white; cursor: pointer;">−</button>
             </div>
-            <div id="extra-features"style="padding: 10px;background: rgb(217 216 245);color: white;/* border-radius: 8px; */display: flex;justify-content: space-between;height: 45px;font-weight: 500;height: 150px;"></div>
-            <div style="padding: 10px;
-            background: rgb(217 216 245);
-            color: white;
-            /* border-radius: 8px; */
-            display: flex;
-            justify-content: space-between;
-            height: 45px;
-            font-weight: 500;
-            height: 60px;">
-            </div>
+            <div id="extra-features"style="padding: 10px;background: rgb(217 216 245);color: white;/* border-radius: 8px; */display: flex;justify-content: space-between;height: 45px;font-weight: 500;height: 60px;"></div>
+            
             <div id="response-container" style="flex: 1; overflow-y: auto; padding: 10px;">
             </div>
             <div style="padding: 10px; border-top: 1px solid #eee;">
