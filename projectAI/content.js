@@ -352,7 +352,7 @@ async function enhanceCodeWithAI(code) {
 
 // Function to minimize the chat box
 function minimizeChatBox(chatBox, minimizeButton, responseContainer) {
-    chatBox.style.height = 'auto';
+    chatBox.style.height = '250px';
     chatBox.style.width = '200px'; // Make the minimized chat box narrower
     responseContainer.style.display = 'none';
     minimizeButton.textContent = '+'; // Change the button to a "+" icon
@@ -360,7 +360,7 @@ function minimizeChatBox(chatBox, minimizeButton, responseContainer) {
 
 // Function to expand the chat box
 function expandChatBox(chatBox, minimizeButton, responseContainer) {
-    chatBox.style.height = '400px';
+    chatBox.style.height = '500px';
     chatBox.style.width = '300px'; // Restore the original width
     responseContainer.style.display = 'block';
     minimizeButton.textContent = '−'; // Change the button to a "−" icon
