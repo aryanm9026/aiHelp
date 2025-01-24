@@ -132,7 +132,7 @@ function createChatBox() {
             justify-content: space-between;
             height: 45px;
             font-weight: 500;
-            height: 150px;">
+            height: 60px;">
             </div>
             <div id="response-container" style="flex: 1; overflow-y: auto; padding: 10px;">
             </div>
