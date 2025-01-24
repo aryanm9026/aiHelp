@@ -1,28 +1,83 @@
-* {
-    padding: 5px;
-    margin: 5px;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    border-radius: 5%;
+.input-group{
+    background-color: rgb(219, 219, 237);
+    width: 200px;
+    height: 150px;
+    border-radius: 10px;
+    padding: 13px;
+    font-family: sans-serif;
+    border: #3d3a47;
+    border-radius: 10px;
+    border-style: solid;
 }
 
-.extention-body{
-    background-color: rgb(0, 0, 0);
-    border-radius: 5%;
-    font-family: "Open Sans", sans-serif;
+
+.api-key{
+    padding: 8px;
+    display: flex;
+    font-size: 16px;
+    font-style: oblique;
+    justify-content: center;
+    color: #271931;
+}
+
+#api-key{
+    width: 200px;
+    height: 16px;
+    font-family: sans-serif;
+    background-color: #d3d3fd;
+    color: #424247a8;
+    border: none;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 2px;
+    position: relative;
+    left: -8px;
+    top: 10px;
+    border: #6273a6;
+    border-radius: 5px;
+    border-style: solid;
+
+}
+
+#save-key{
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: rgb(26 24 108);
+    width: 200px;
+    position: relative;
+    bottom: -30px;
+    height: 25px;
+}
+
+body{
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background-color: #e2e5ff;
+    border: none;
+    height: 240px;
+    background-image: radial-gradient(circle, rgb(26 24 108), #a2bbff);
+      
+}
+
+#extract{
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    background-color: rgb(26 24 108);
+    width: 200px;
+    position: relative;
+    bottom: -8px;
+    height: 25px;
+}
+
+#response{
     font-weight: bold;
-    border-color: black;
-    border-style: dashed;
+    font-family: sans-serif;
+    position: relative;
+    top: 10px;
 }
 
-.extention-body1{
-    font-family: "Open Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: bold;
-}
-
-.main-box{
-    background-color: rgb(0, 0, 0); 
-    border-radius: 5%;
-    margin: 3%;
-}
