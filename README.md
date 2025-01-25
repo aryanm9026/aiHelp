@@ -13,22 +13,16 @@ This is an AI-powered browser extension designed to assist users with coding-rel
    - Provides AI-generated responses to user queries, such as code explanations, error detection, and optimization suggestions.
 
 3. **Quick Suggestions**:
-   - Displays suggested questions like "Enhance this code", "Explain this code", and "Find errors in this code" for quick interaction.
+   - Displays suggested questions like "Solve this code", "Explain this code", and "Do it in another way" for quick interaction.
 
 4. **Interactive Chatbox**:
    - A chatbox interface where users can type their queries and receive AI-generated responses.
    - Supports drag-to-move, resizing, and minimizing the chatbox.
 
-5. **Typing Indicator**:
-   - Shows a "AI is typing..." indicator while the AI processes the input.
-
-6. **Clear Chat**:
-   - Allows users to clear the chat history with a single click.
-
-7. **Input Validation**:
+5. **Input Validation**:
    - Prevents empty queries from being sent.
 
-8. **Modern Design**:
+6. **Modern Design**:
    - A sleek and user-friendly design with gradients, shadows, and animations.
 
 ---
@@ -97,14 +91,11 @@ The project consists of the following files:
 3. **View Responses**:
    - The AI's response will appear in the chatbox.
 
-4. **Clear Chat**:
-   - Click the **Clear** button to reset the chat history.
-
-5. **Resize and Move**:
+4. **Resize and Move**:
    - Drag the chatbox to move it around the screen.
    - Use the resize handles in the corners to adjust the size.
 
-6. **Minimize**:
+5. **Minimize**:
    - Click the **−** button to minimize the chatbox. Click it again to restore.
 
 ---
@@ -141,6 +132,12 @@ The project consists of the following files:
 
 5. **Export Chat History**:
    - Allow users to export their chat history for future reference.
+  
+6.  **Clear Chat**:
+   - Allows users to clear the chat history with a single click
+
+7. **Typing Indicator**:
+   - Shows that AI is typing
 
 ---
 
